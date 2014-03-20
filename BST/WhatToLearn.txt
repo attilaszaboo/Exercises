@@ -1,0 +1,40 @@
+You should know about tree problems, 
+- DONE - how to generate fibonacci numbers. 
+- DONE - how to write a function that would demonstrate that a tree is a binary search tree. 
+- DONE - Search in a binary search tree. 
+- DONE - Find the depth of a binary search tree. 
+- DONE - Serialize / deserialize a binary (search) tree. 
+- DONE - Return the intersection of two sorted arrays (2 or 3 methods): 
+	- traverse in parallel with two pointers linearly; 
+	- or use traverse one and search using binary search in the second array
+	- Or put the large array in a hashmap
+DONE - implement a circular queue of size n (using arrays )
+DONE -  print the depth of each node in a binary tree
+DONE - Implement binary search
+
+
+Know 
+- DONE - exception handling basics, what it is, pros and cons, why use it instead of error code being returned.
+- DONE - how to generate fibonacci numbers. 
+- DONE - What REST API  is, and what it's 4 verbs are GET POST PUT DELETE
+
+WORK EXPERIENCE
+Expose functionality of desktop 3D modeling software as web services.
+I was the technical lead on this project, although at the begining I had no experience with web services or REST.
+I learned on the go, guiding my 2 team mates and sharing with them the knowledge as I acquired it.
+- Used mongoose http server running inside 3ds Max
+- Exposed REST APIs 
+	- for opening a scene file
+	- Streaming the viewport image 
+	- Listing the objects in the scene
+	- Rendering the scene 
+	- Executing Maxscript commands (3ds Max proprietary scripting language)
+- Created WCF (Windows Communication Framework) based prototype
+	- Developer can focus solely on the business logic, most of the plumbing is in WFC and can be configured vai config files
+
+Challenges
+- 3ds Max is single threaded but had to sever several web client request each in its own thread
+	- Used critical sections and caching of viewport image
+	-	Performance of viewport transfer 
+	- Mapping resources and behaviour to REST resources was fun and interesting
+		- Some of 3ds Max's functionality was not REST ready (ex: FileOpen() was not )
