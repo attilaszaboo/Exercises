@@ -3,7 +3,7 @@
 
 #include "stdafx.h"
 
-// Interset two sorted arrays
+// Intersect two sorted arrays
 // a[] of size m, b[] of size n
 // If the values in the arrays do not overlap, intersection is void
 // Allocate c[] of size min(m, n)

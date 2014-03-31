@@ -31,7 +31,7 @@ struct BSTNode
 	// Returns true if the BT is a BST, false otherwise
 	static bool IsBST(BSTNode* root, int minVal, int maxVal);
 	// If an in-order traversal yields node values in ascending order, tree is BST
-	static bool IsBST2(BSTNode* n, int prevVal);
+	static bool IsBST2(BSTNode* n, int& prevVal);
 
 	// Returns the depth of the BST
 	static int Depth(BSTNode* root);
@@ -55,6 +55,7 @@ struct BSTNode
 	static void PreOrderTraversalRecursive(BSTNode* n, Visit visitorFunc);
 	static void InOrderTraversalRecursive(BSTNode* n, Visit visitorFunc);
 	static void PreOrderTraversalIterative(BSTNode* n, Visit visitorFunc);
+	static void BreadthFirstTraversal
 };
 
 BSTNode* BSTNode::Insert(BSTNode*& root, int value)
@@ -129,6 +130,11 @@ void BSTNode::PreOrderTraversalRecursive(BSTNode* n, Visit visitorFunc)
 	}
 }
 
+void BSTNode::PreOrderTraversalIterative(BSTNode* n, Visit visitorFunc)
+{
+
+}
+
 void BSTNode::InOrderTraversalRecursive(BSTNode* n, Visit visitorFunc)
 {
 	if (!visitorFunc) return;
@@ -142,6 +148,84 @@ void BSTNode::InOrderTraversalRecursive(BSTNode* n, Visit visitorFunc)
 
 }
 
+void BSTNode::InOrderTraversalIterative(BSTNode* n)
+{
+	// Push the current node into a stack
+	// Go to its left child
+	// If current node is null, pop the top of the stack, visit it
+	// Go to the right child
+	// until stack is empty
+
+	if (!n) return;
+	Stack<BSTNode*> stack;
+	bool done = false;
+	BSTNode* current = n;
+
+	while (!done)
+	{
+		if (current)
+		{
+			stack.push(current);
+			current = current->mLeft;
+		}
+		else
+		{
+			if (stack.Empty())
+			{
+				done = true
+			}
+			else
+			{
+				current = stack.pop();
+				Visit(current);
+				current = current->mRight;
+			}
+		}
+	}
+}
+
+void BSTNode::PostOrderTraversalIterative(BSTNode* n)
+{
+	if (!n) return;
+
+	Stack<BSTNode*> stack;
+	Stack<BSTNode*> outputStack;
+
+	stack.push(n);
+	while (!stack.empty())
+	{
+		BSTNode* cur = stack.pop();
+		outputStack.push(cur);
+		if (cur->mLeft) stack.push(cur->mLeft);
+		if (cur->mRight) stack.push(cur->mRight);
+	}
+	while (!outputStack.empty())
+	{
+		BSTNode* cur = outputStack.pop();
+		print(cur->mValue);
+	}
+}
+
+BSTNode* BSTNode::LowestCommonAncestorBST(Node* root, Node *p, Node *q) 
+{
+	if (!root || !p || !q) return NULL;
+	if (max(p->data, q->data) < root->data)
+		return LCA(root->left, p, q);
+	else if (min(p->data, q->data) > root->data)
+		return LCA(root->right, p, q);
+	else
+		return root;
+}
+
+bool CompareBinaryTree(BSTNode* a, BSTNode* b)
+{
+	if (!a && !b) return true;
+	if (a && b)
+	{
+		return (a->mValue == b->mValue && CompareBinaryTree(a->mLeft, b->mLeft) && CompareBinaryTree(a->mRight, b->mRight));
+	}
+	return false; // either a or b is nullptr
+}
 static void Print(BSTNode* n)
 {
 	if (n) cout << n->mValue << " ";
@@ -177,17 +261,20 @@ bool BSTNode::IsBST(BSTNode* n, int minValue, int maxValue)
 
 
 // In a BST, an in-order travesal of the nodes lists them in ascending order
-bool BSTNode::IsBST2(BSTNode* n, int prevVal)
+// prevVal should always be smaller than current nodes value
+bool BSTNode::IsBST2(BSTNode* n, int& prevVal)
 {
 	if (n == nullptr) return true;
 
 	bool left = IsBST2(n->mLeft, prevVal);
 	if (!left) return false;
 	if (n->mValue < prevVal) return false;
-	bool right = IsBST2(n->mRight, n->mValue);
-	return left && right;
+	prevVal = n->mValue;
+	bool right = IsBST2(n->mRight, prevVal);
+	return right;
 }
 
+// No need for null-sentinel because we know the tree is BST so values need to obey condition
 void BSTNode::SerializeIn(BSTNode*& n, int& value, int minVal, int maxVal, ifstream& fin)
 {
 	if (minVal < value && value < maxVal)
@@ -200,6 +287,43 @@ void BSTNode::SerializeIn(BSTNode*& n, int& value, int minVal, int maxVal, ifstr
 			SerializeIn(n->mRight, value, nodeVal, maxVal, fin);
 		}
 	}
+}
+
+// Serialize out using a pre-order traversal, mark null children with special char (#)
+// Serialize in (pre-order traversal)
+void DeSerializeBinaryTree(Node*& n)
+{
+	bool isNumber = true;
+	int token = 0;
+	if (readNextToken(fin, token, isNumber))
+	{
+		if (isNumber)
+		{
+			n = Node(token);
+			SerializeBinaryTree(n->left);
+			SerializeBinaryTree(n->Right);
+		}
+	}
+}
+// Deserialize binary tree without using special chars as placeholders for null children
+// We need the pre-order and in-order representation of the tree.
+// The first item in the pre-order array is the root node,
+// Find it in the in-order array, and thus we know the bounds of the left and the right sub-trees
+Node* DeserializeBinaryTree(int pre[], int preStart, int preEnd, int in[], int inStart, int inEnd)
+{
+	if (preStart > preEnd) return nullptr;
+	if (preStart == preEnd) return new Node(pre[preStart]);
+
+	// Find root node index in in-order array
+	int rootIndex = binarySearch(in, inStart, inEnd, pre[preStart]);
+	// Calculate count of nodes in left and right sub-trees
+	int leftCount = rootIndex - inStart;
+	//int rightCount = inEnd - rootIndex;
+
+	Node* n = new Node(pre[preStart]);
+	n->left = DeserializeBinaryTree(pre, preStart + 1, preStart + leftCount, in, inStart, inStart + leftCount - 1);
+	n->right = DeserializeBinaryTree(pre, preStart + leftCount + 1, preEnd, in, inStart + leftCount + 1, inEnd);
+
 }
 
 void BSTNode::PrintDepth(BSTNode* n, int& depth)

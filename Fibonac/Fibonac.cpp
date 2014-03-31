@@ -27,9 +27,7 @@ int GetFib(int n)
 	if (0 == n) return 0;
 	if (1 == n) return 1;
 	if (fibs[n] != 0) return fibs[n];
-	fibs[n - 1] = GetFib(n - 1);
-	fibs[n - 2] = GetFib(n - 2);
-	fibs[n] = fibs[n - 1] + fibs[n - 2];
+	fibs[n] = GetFib(n - 1) + GetFib(n - 2);
 	return fibs[n];
 }
 int Fibonacci2(int n)
